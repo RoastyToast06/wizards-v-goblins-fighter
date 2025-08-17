@@ -1,8 +1,11 @@
-# Wizards vs. Goblins
-This game features an 8-bit game of wizards facing goblins using magical spells! This project was designed for my Data Structures & Algorithms course.
+# Wizards vs. Goblins Retro Fighter
+This game features an 8-bit wizard fighter against hordes of goblins!
 
 ## Project Details
-This project was coded entirely in C#, but my teaching assistant designed the renderer for the class assignment. The game implementation utilizes ArrayLists to manage all entities and update all interactions and features.
+This game was created as part of a Data Structures & Algorithms assignment using C# & Monogame. My teaching assistant created the renderer & sprite designs for the project; the gameplay logic and sprite implementation are implemented by me. This project utilizes ArrayLists to organize & update entity interactions. Entity logic includes:
+- Goblins will attack the wizard with the lowest health; wizards will cast magic to attack all goblins within the spell's range.
+- If there are no goblins in range of a wizard's spell, the wizard will move towards the closest goblin. However, goblins will move in a random direction.
+- During the game, a new goblin will join the battle every 15 frames, whereas new wizards join every 50 frames.
 
 ## Gameplay Video
 https://github.com/user-attachments/assets/00d096b2-d2be-4b8c-8704-1325edc72838
