@@ -12,9 +12,4 @@ This game was created as part of a Data Structures & Algorithms assignment using
 
 ## Gameplay Video
 
-<video controls width="720">
-    <source src="./WizardFighter-Gameplay.mp4" type="video/mp4">
-    Your browser does not support the video tag. 
-    <a href="WizardFighter-Gameplay.mp4"> Download / Play Video</a>
-</video>
-
+https://github.com/user-attachments/assets/76332c13-5258-4959-bb0d-8bd7f8beaafa
