@@ -42,10 +42,10 @@ public class WizardFighterDX : Visualizer
 
     protected override void Update()
     {
+        List<CombatEntity> deadEntities = new();
+
         foreach (CombatEntity entity in AllEntities.ToList())
         {
-            List<CombatEntity> deadEntities = new();
-
             // Wiggle the entity around
             float dx = RNG.NextSingle() - 0.5f;
             float dy = RNG.NextSingle() - 0.5f;
@@ -65,7 +65,7 @@ public class WizardFighterDX : Visualizer
                     // Attack the weakest wizard in range
                     var weakestWizard = wizardsInRange.OrderBy(wizard => wizard.HP).FirstOrDefault();
                     if (weakestWizard == null) continue;
-                    
+
                     goblin.MoveTowards(weakestWizard, goblin.DistanceTo(weakestWizard) - 1.0f);
                     goblin.Attack(weakestWizard, goblin.AttackPower, CurrentTimestamp);
                     weakestWizard.PushAwayFrom(goblin, 1.50f);
@@ -75,26 +75,10 @@ public class WizardFighterDX : Visualizer
                     {
                         deadEntities.Add(weakestWizard);
                         LogMessage($"{weakestWizard} has been defeated!");
-
-                        //Add a new wizard every 50 ticks after one dies
-                        if (CurrentTimestamp % 50 == 0)
-                        {
-                            Wizard wizard = new();
-                            Wizards.Add(wizard);
-
-                            //Add the wizard to the list of all entities while keeping the list sorted
-                            //Find the index of the first wizard with a higher max HP than the new wizard, then insert the new wizard before that index
-                            int index = Wizards.FindIndex(w => w.HP < wizard.HP);
-
-                            if (index == -1) AllEntities.Add(wizard);
-
-                            else AllEntities.Insert(index, wizard);
-
-                            LogMessage($"A new wizard has appeared: {wizard}!");
-                        }
                     }
                 }
             }
+
             else if (entity is Wizard wizard)
             {
                 //List all goblins in range
@@ -112,31 +96,14 @@ public class WizardFighterDX : Visualizer
 
                         if (gobby.HP <= 0)
                         {
-                            //Add a new goblin every 15 ticks after one dies
                             deadEntities.Add(gobby);
-                            LogMessage($"{gobby} has been slain by {wizard}");
-                            if (CurrentTimestamp % 15 == 0)
-                            {
-                                Goblin newGoblin = new();
-                                Goblins.Add(newGoblin);
-
-                                //Add the goblin to the list of all entities while keeping the list sorted
-                                //Find the index of the first goblin with a higher max HP than the new goblin, then insert the new goblin before that index
-                                int index = Goblins.FindIndex(g => g.HP < newGoblin.HP);
-
-                                if (index == -1) AllEntities.Add(newGoblin);
-
-                                else AllEntities.Insert(index, newGoblin);
-
-                                LogMessage($"A new goblin has appeared: {newGoblin}!");
-                            }
+                            LogMessage($"{gobby} has been slain by {wizard}!");
                         }
                     }
                 }
+
                 else
                 {
-                    // Move towards the nearest goblin
-                    // Also check for null in case all goblins are dead
                     var nearestGoblin = Goblins.OrderBy(goblin => wizard.DistanceTo(goblin)).FirstOrDefault();
                     if (nearestGoblin == null) continue;
 
@@ -144,14 +111,40 @@ public class WizardFighterDX : Visualizer
                     wizard.MoveTowards(nearestGoblin, 0.5f);
                 }
             }
+        }
 
-            //Remove dead entities
-            foreach (var deadEntity in deadEntities)
-            {
-                AllEntities.Remove(deadEntity);
-                if (deadEntity is Goblin deadGoblin) Goblins.Remove(deadGoblin);
-                else if (deadEntity is Wizard deadWizard) Wizards.Remove(deadWizard);
-            }
+        // New goblins are added every 15 frames after one dies
+        if (CurrentTimestamp % 15 == 0 && Goblins.Count < NUM_GOBLINS)
+        {
+            Goblin newGoblin = new();
+            Goblins.Add(newGoblin);
+
+            int gobIndex = AllEntities.FindIndex(g => g.MaxHP < newGoblin.MaxHP);
+            if (gobIndex == -1) AllEntities.Add(newGoblin);
+            else AllEntities.Insert(gobIndex, newGoblin);
+
+            LogMessage($"A new goblin has appeared: {newGoblin}!");
+        }
+
+        // New wizards are added every 50 frames
+        if (CurrentTimestamp % 50 == 0 && Wizards.Count < NUM_WIZARDS)
+        {
+            Wizard newWizard = new();
+            Wizards.Add(newWizard);
+
+            int wizIndex = AllEntities.FindIndex(w => w.MaxHP < newWizard.MaxHP);
+            if (wizIndex == -1) AllEntities.Add(newWizard);
+            else AllEntities.Insert(wizIndex, newWizard);
+
+            LogMessage($"A new wizard has appeared: {newWizard}!");
+        }
+
+        // Remove dead entities -- distinct ensures no duplicates are removed
+        foreach (var deadEntity in deadEntities.Distinct().ToList())
+        {
+            AllEntities.Remove(deadEntity);
+            if (deadEntity is Goblin deadGoblin) Goblins.Remove(deadGoblin);
+            else if (deadEntity is Wizard deadWizard) Wizards.Remove(deadWizard);
         }
 
         if (Wizards.Count == 0 || Goblins.Count == 0)
