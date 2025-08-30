@@ -12,4 +12,4 @@ This game was created as part of a Data Structures & Algorithms assignment using
 
 ## Gameplay Video
 
-https://github.com/user-attachments/assets/76332c13-5258-4959-bb0d-8bd7f8beaafa
+https://github.com/user-attachments/assets/5a52f23e-ae78-4805-8943-0901f313b01d
